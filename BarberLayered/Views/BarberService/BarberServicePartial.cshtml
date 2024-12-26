@@ -1,0 +1,148 @@
+﻿@{
+    Layout = null;
+}
+
+@{
+    var barber = ViewBag.Barber as BarberLayered.Models.Barber;
+    var services = ViewBag.Services as List<BarberLayered.Models.Service>;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Services</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .barber-photo {
+            display: block;
+            margin: 0 auto;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .barber-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+            .barber-info h2 {
+                margin-top: 0;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 20px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .service-button {
+            background-color: #905B22;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+            .service-button:hover {
+                background-color: #684116;
+            }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+
+    <div class="container">
+        <img src="@barber.PhotoUri" alt="@barber.Name" class="barber-photo">
+        <div class="barber-info">
+            <h2>@barber.Name @barber.Surname</h2>
+        </div>
+
+        <h1>Послуги</h1>
+        @if (!services.Any())
+            {
+                <h2 style="text-align: center; color: forestgreen; margin-top: 100px;">Ще немає доступних послуг</h2>
+            }
+        else
+            {
+            <table>
+                <tr>
+                    <th>Назва</th>
+                    <th>Опис</th>
+                    <th>Тривалість</th>
+                    <th style="white-space: nowrap;">Ціна (₴)</th>
+                    <th></th>
+                </tr>
+                @foreach (var service in services)
+                {
+                    <tr>
+                        <td>@service.Title</td>
+                        <td>@service.Description</td>
+                        <td>
+                            @{
+                                var durationString = $"{(service.Duration.Hour > 0 ? service.Duration.Hour + " год " : "")}{(service.Duration.Minute > 0 ? service.Duration.Minute + " хв " : "")}{(service.Duration.Second > 0 ? service.Duration.Second + " сек" : "")}";
+                                @durationString
+                            }
+                        </td>
+                        <td>@service.Price</td>
+                        @* <td><a href="#" class="service-button">Записатись</a></td> *@
+                        @* <td><a href="@Url.Action(ViewData["Path"].ToString(), "ServiceAppointment", new { barberId = barber.Id, serviceId = service.Id })" class="service-button">Записатись</a></td> *@
+                        <td><a href="/ServiceAppointment/ServiceAppointment" class="service-button">Записатись</a></td>
+
+                    </tr>
+                }
+            </table>
+            }
+    </div>
+
+    <!-- Кнопка назад -->
+    <button class="back-button" onclick="goBack()">&#10094;</button>
+
+    <script>
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage !== 'null' && errorMessage !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: errorMessage
+            });
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+</body>
+</html>

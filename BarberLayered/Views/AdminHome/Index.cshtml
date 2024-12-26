@@ -1,0 +1,305 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            height: 30px;
+        }
+
+            header a {
+                color: #fff;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 18.5px;
+                margin: 0 10px;
+            }
+
+                header a:hover {
+                    color: #e6ba73;
+                }
+
+        footer {
+            background-color: #333;
+            height: 30px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 30px;
+        }
+
+        .left-section {
+            width: 50%;
+            padding: 20px 65px;
+            box-sizing: border-box;
+            min-height: calc(100vh - 60px);
+            transition: margin-left 0.3s;
+        }
+
+            .left-section img {
+                width: 100%;
+                height: auto;
+            }
+
+        .change-image-btn {
+            background-color: #905B22;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+            .change-image-btn:hover {
+                background-color: #f5a742;
+            }
+
+        .right-section {
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: width 0.3s;
+        }
+
+            .right-section h1 {
+                font-size: 24px;
+                margin-top: 0;
+                color: #333;
+            }
+
+            .right-section p {
+                margin: 10px 0;
+                font-size: 18px;
+                color: #555;
+            }
+
+            .right-section a {
+                display: inline-block;
+                background-color: #905B22;
+                color: #fff;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 10px;
+                transition: background-color 0.3s;
+                margin-top: 20px;
+                font-size: 20px;
+                margin-right: 10px;
+            }
+
+                .right-section a:hover {
+                    background-color: #f5a742;
+                }
+
+        .show-hide-btn {
+            position: fixed;
+            top: 50px;
+            left: 10px;
+            background-color: #905B22;
+            color: #fff;
+            padding: 6px 11px 7px 10px;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 999;
+        }
+
+        .sidebar {
+            width: 15%;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f5f5f5;
+            color: #333;
+            display: block;
+            position: fixed;
+            top: 30px;
+            left: 0;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+            border-right: 1px solid #ccc;
+        }
+
+            .sidebar ul {
+                list-style-type: none;
+                padding: 0;
+            }
+
+            .sidebar li {
+                margin-bottom: 10px;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            .sidebar a {
+                display: block;
+                padding: 20px 15px;
+                text-decoration: none;
+                color: #333;
+                transition: background-color 0.3s, color 0.3s;
+                border-radius: 10px;
+                font-size: 18px;
+            }
+
+                .sidebar a:hover {
+                    background-color: #ddd;
+                }
+
+                .sidebar a.active {
+                    background-color: #e6ba73;
+                    color: #fff;
+                }
+
+        .show-hide-btn::after {
+            content: '\2630';
+        }
+
+        .shift-right {
+            margin-left: 15%;
+        }
+
+        .sidebar li:first-child a {
+            margin-top: 125px;
+        }
+
+        header, footer {
+            color: white;
+            text-align: center;
+            line-height: 30px;
+        }
+
+
+        .sidebar li:nth-child(5) a {
+            margin-top: 30px;
+            position: relative;
+        }
+
+            .sidebar li:nth-child(5) a::before {
+                content: "";
+                position: absolute;
+                top: -10px;
+                left: 15px;
+                width: calc(100% - 30px);
+                border-top: 2px solid #ccc;
+            }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+
+    <header>
+        <span style="font-weight: bold; font-size: 20px; text-align: center;">AdminPanel</span>
+        @* <a href="/AdminHome/Index">AdminPanel</a> *@
+    </header>
+
+    <div class="container">
+        <div class="left-section shift-right" id="left-section">
+            <img src="https://heygoldie.com/blog/wp-content/uploads/2021/12/barber-shop-decor-ideas.jpg" alt="Barber Shop Image">
+            <button class="change-image-btn" onclick="document.getElementById('fileInput').click()">Змінити зображення</button>
+            <input type="file" id="fileInput" style="display: none;">
+        </div>
+        <div class="right-section" id="right-section">
+            <h1 id="name">@Model.Name</h1>
+            <p>Адреса: <span id="address" contenteditable="false">@Model.Address</span></p>
+            <p>Телефон: <span id="phone" contenteditable="false">@Model.Phone</span></p>
+            <p id="description" contenteditable="false">@Model.Description</p>
+            <a href="#" class="button" onclick="toggleEditMode()">Редагувати</a>
+            <a href="#" class="button" style="margin-top: 50px;">Зберегти зміни</a>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li><a href="#" class="active" onclick="changeTab(event)">BarberBook Інформація</a></li>
+            <li><a href="#" onclick="changeTab(event)">Усі барбери</a></li>
+            <li><a href="#" onclick="changeTab(event)">Користувачі</a></li>
+            <li><a href="/AdminHome/AddBarber">Додати барбера</a></li>
+            <li><a href="@Url.Action("AdminAccount", "AdminHome", new { AdminId = ViewBag.Admin.Id })" onclick="changeTab(event)">Акаунт</a></li>
+        </ul>
+    </div>
+
+    <footer>
+        &copy; 2024 - Barber Shop
+    </footer>
+
+    <button class="show-hide-btn" onclick="toggleSidebar()"></button>
+
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            var leftSection = document.getElementById('left-section');
+
+            if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+                sidebar.style.display = 'block';
+                leftSection.classList.add('shift-right');
+            } else {
+                sidebar.style.display = 'none';
+                leftSection.classList.remove('shift-right');
+            }
+        }
+
+        function changeTab(event) {
+            var tabs = document.querySelectorAll('.sidebar a');
+            tabs.forEach(function (tab) {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function toggleEditMode() {
+            var elementsToEdit = document.querySelectorAll('[contenteditable]');
+
+            elementsToEdit.forEach(function (element) {
+                if (!element.classList.contains("editing")) {
+                    element.classList.add("editing");
+                    element.contentEditable = "true";
+                    element.style.backgroundColor = "#f3f3f3";
+                } else {
+                    element.classList.remove("editing");
+                    element.contentEditable = "false";
+                    element.style.backgroundColor = "";
+                }
+            });
+        }
+
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage !== 'null' && errorMessage !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Упс...',
+                text: errorMessage
+            });
+        }
+
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage !== 'null' && successMessage !== '') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Успішно!',
+                text: successMessage
+            });
+        }
+    </script>
+
+</body>
+</html>

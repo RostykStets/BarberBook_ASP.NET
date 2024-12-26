@@ -1,0 +1,186 @@
+﻿@* @model BusinessLogicLayer.DTOs.BarberDto
+
+ *@
+@model BarberLayered.Models.Barber
+
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    var barber = ViewBag.Barber as BarberLayered.Models.Barber;
+    var visits = ViewBag.Visits as List<BarberLayered.Models.Visit>;
+}
+
+@{
+    Layout= null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+        }
+
+        .content {
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .photo {
+            flex: 1;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #905B22;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 1rem;
+        }
+
+            .button:hover {
+                background-color: #f5a742;
+            }
+
+        .schedule {
+            margin-top: 50px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f5f5f5;
+        }
+
+        .edit-profile {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+            .edit-profile a {
+                text-decoration: none;
+                color: #333;
+                border: 1px solid #ccc;
+                padding: 5px 10px;
+                border-radius: 5px;
+                display: inline-block;
+            }
+
+                .edit-profile a:hover {
+                    background-color: #f5f5f5;
+                }
+
+        .barber-photo {
+            display: block;
+            margin: 0 auto;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    @await Html.PartialAsync("~/Views/BarberHome/BarberHomePartial.cshtml", Model)
+
+
+
+    <div class="container">
+        <div class="content">
+            <h1>Вітаємо, @barber?.Name!</h1>
+            <p>Номер телефону: @barber?.Phone</p>
+            <p>Електронна адреса: @barber?.Email</p>
+            <p> @barber?.Description</p>
+
+            <div class="schedule">
+                <h2>Сьогоднішні записи :</h2>
+                @{
+                    var todayVisits = @visits?.Where(v => v.Date == DateOnly.FromDateTime(DateTime.Today)).ToList();
+                }
+                @if (todayVisits != null && todayVisits.Any())
+                {
+                    <table>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Час початку</th>
+                            <th>Час кінця</th>
+                            <th>Клієнт</th>
+                            <th>Послуга</th>
+                        </tr>
+
+                        @foreach (var visit in todayVisits)
+                        {
+                            <tr>
+                                <td>@visit.Date</td>
+                                <td>&nbsp;@visit.StartTime</td>
+                                <td>&nbsp;@visit.EndTime</td>
+                                <td>@visit.VisitorFullName</td>
+                                <td>@visit.ServiceTitle</td>
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <h2 style="color: forestgreen; margin-top: 100px;">Сьогодні у вас немає записів</h2>
+                }
+            </div>
+        </div>
+
+        <div class="photo">
+            @* <img src="@Model.PhotoUri" alt="@Model.Name" class="barber-photo"> *@
+            <img src="@barber.PhotoUri" alt="@barber.Name" class="barber-photo">
+            <div class="edit-profile">
+                <a href="@Url.Action("EditProfile", "BarberHome", new { barberId = @barber.Id })" class="service-button">Налаштування акаунта</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
+
+
+

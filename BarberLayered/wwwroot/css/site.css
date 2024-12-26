@@ -1,0 +1,91 @@
+/*html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}*/
+
+
+.back-button {
+    position: fixed;
+    top: 60px;
+    left: 35px;
+    padding: 4px 22px 7px 16px; 
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    color: #555;
+    font-size: 38.5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .back-button:hover {
+        background-color: #ddd;
+    }
+
+.confirmation-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+}
+
+.confirmation-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+    .confirmation-box h2 {
+        margin-top: 0;
+    }
+
+    .confirmation-box button {
+        margin-top: 10px;
+        margin-right: 10px;
+    }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 20%;
+}

@@ -1,0 +1,17 @@
+﻿@model List<BarberLayered.Models.Service>
+
+@{
+    var barber = ViewBag.Barber as BarberLayered.Models.Barber;
+    var services = ViewBag.Services as List<BarberLayered.Models.Service>;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+    @Html.Partial("~/Views/BarberService/BarberServicePartial.cshtml", Model)
+
+</body>
+</html>

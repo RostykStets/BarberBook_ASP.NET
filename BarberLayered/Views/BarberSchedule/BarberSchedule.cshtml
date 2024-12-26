@@ -1,0 +1,214 @@
+﻿@using System.Globalization
+@model BusinessLogicLayer.DTOs.BarberDto
+
+@{
+    var cultureInfo = new CultureInfo("uk-UA");
+}
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Розклад барбера @Model.Name</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            /* display: flex; */
+        }
+
+        .schedule {
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .edit-button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        .barber-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+            .barber-info h2 {
+                margin-top: 0;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+
+        .day-off-checkbox {
+            height: 20px;
+            width: 20px;
+            vertical-align: middle;
+        }
+
+        .inactive-row {
+            color: #aaa;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    @await Html.PartialAsync("~/Views/BarberHome/BarberHomePartial.cshtml")
+
+    <div class="container">
+
+        <div class="barber-info">
+            <h2>Мій розклад</h2>
+            <h3>Сумарний час роботи на тиждень: <span id="totalHours">0 год 0 хв</span></h3>
+        </div>
+
+        @if (ViewBag.Schedules == null || ViewBag.Schedules.Count == 0)
+        {
+            <p>Розклад відсутній для барбера @Model.Name</p>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>День тижня</th>
+                        <th>Початок робочого часу</th>
+                        <th>Кінець робочого часу</th>
+                        <th>Вихідний</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var schedule in ViewBag.Schedules)
+                    {
+                        <tr>  
+                            <td>@schedule.DayOfWeek</td>
+                            <td><input type="text" class="timepicker start-time" value="@schedule.StartTime"></td>
+                            <td><input type="text" class="timepicker end-time" value="@schedule.EndTime"></td>
+                            <td><input type="checkbox" class="day-off-checkbox"></td>
+                            @* <td><input type="checkbox" class="day-off-checkbox" disabled @((schedule.IsDayOff) ? "checked" : "")></td> *@
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <button class="back-button" onclick="goBack()">&#10094;</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <script>
+        $(function () {
+            $(".timepicker").timepicker({
+                timeFormat: 'HH:mm',
+                interval: 30,
+                scrollbar: true
+            });
+
+            $(".day-off-checkbox").change(function () {
+                var isChecked = $(this).is(":checked");
+                var row = $(this).closest('tr');
+                row.find('.timepicker').prop('disabled', isChecked);
+                if (isChecked) {
+                    row.find('.timepicker').val('00:00');
+                    row.addClass('inactive-row');
+                } else {
+                    row.removeClass('inactive-row');
+                }
+                calculateTotalHours();
+            });
+
+            $(".timepicker").change(function () {
+                calculateTotalHours();
+            });
+
+        });
+
+        $(document).ready(function () {
+            calculateTotalHours(); 
+        });
+
+        function calculateTotalHours() {
+            var daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            var totalMinutes = 0;
+
+            daysOfWeek.forEach(function (day) {
+                var dayTotalMinutes = 0;
+
+                var rows = $("td:contains('" + day + "')").closest('tr');
+
+                rows.each(function () {
+                    var startTime = $(this).find('.start-time').val();
+                    var endTime = $(this).find('.end-time').val();
+
+                    var startParts = startTime.split(":");
+                    var endParts = endTime.split(":");
+
+                    var startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
+                    var endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
+
+                    var diffMinutes = endMinutes - startMinutes;
+
+                    dayTotalMinutes += diffMinutes;
+                });
+
+                totalMinutes += dayTotalMinutes;
+            });
+
+            var totalHours = Math.floor(totalMinutes / 60);
+            var remainingMinutes = totalMinutes % 60;
+
+            $("#totalHours").text(totalHours + " год " + remainingMinutes + " хв");
+        }
+
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+
+</body>
+</html>

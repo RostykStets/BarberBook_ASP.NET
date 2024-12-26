@@ -1,0 +1,159 @@
+﻿@{
+    var barber = ViewBag.Barber as BarberLayered.Models.Barber;
+    var reviews = ViewBag.Reviews as List<BarberLayered.Models.Review>;
+}
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@barber.Name - Barber Information</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .barber-photo {
+            display: block;
+            margin: 0 auto;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .barber-description {
+            margin-bottom: 20px;
+            font-size: 20px;
+            line-height: 1.4;
+        }
+
+        .barber-info {
+            text-align: center;
+        }
+
+            .barber-info h2 {
+                margin-top: 0;
+            }
+
+        .barber-details {
+            margin-bottom: 20px;
+        }
+
+        .contacts {
+            float: right;
+            margin-right: 20px;
+        }
+
+            .contacts h3 {
+                margin-top: 0;
+            }
+
+            .contacts p {
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+
+        h3.reviews {
+            margin-top: 100px;
+        }
+
+        .review-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+            .review-item:last-child {
+                border-bottom: none;
+            }
+
+        .review-text {
+            margin: 0;
+            font-size: 17.5px;
+            line-height: 1.4;
+        }
+
+        .review-details {
+            font-style: italic;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .review-rating {
+            color: #ffd700;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+    <div class="container">
+        <img src="@barber.PhotoUri" alt="@barber.Name" class="barber-photo">
+        <div class="barber-info">
+            <h2>@barber.Name @barber.Surname</h2>
+            <p class="barber-description">@barber.Description</p>
+
+            <div class="contacts">
+                <div class="barber-details">
+                    <p><a href="tel:@barber.Phone">Телефон: @barber.Phone</a></p>
+                    <p><a href="mailto:@barber.Email">Email: @barber.Email</a></p>
+                </div>
+            </div>
+        </div>
+        <h3 class="reviews">Відгуки:</h3>
+        <div class="reviews">
+            @if (!reviews.Any())
+            {
+                <h3 style="text-align: center; color: forestgreen; margin-top: 100px;">Ще немає відгуків</h3>
+            }
+            else
+            {
+                @foreach (var review in reviews)
+                {
+                    <div class="review-item">
+                        <p class="review-text">@review.Text</p>
+                        <p class="review-details">Автор: Client @review.fk_ClientId | Дата: @review.Date.ToShortDateString()</p>
+                        <p class="review-rating">Оцінка: @review.Rating/5</p>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Кнопка назад -->
+    <button class="back-button" onclick="goBack()">&#10094;</button>
+
+    <script>
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage !== 'null' && errorMessage !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: errorMessage
+            });
+        }
+
+        // Функція для повернення на попередню сторінку
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
+
+

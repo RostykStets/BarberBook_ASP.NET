@@ -1,0 +1,392 @@
+﻿@{
+    var barber = ViewBag.Barber as BarberLayered.Models.Barber;
+    var services = ViewBag.Services as List<BarberLayered.Models.Service>;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Appointment Signup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        select {
+            width: 98%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        input[type="datetime-local"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+
+        .barber-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        .barber-card {
+            width: 200px;
+            padding: 10px;
+            padding-top: 30px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            /* transition: box-shadow 0.3s ease; */
+        }
+
+        ./* barber-card.selected {
+            border-color: rgb(255, 102, 0);
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.4);
+        }
+
+        .barber-card:hover:not(.selected) {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        } */
+
+        .barber-info {
+            margin-bottom: 10px;
+        }
+
+        .barber-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto;
+            display: block;
+        }
+
+        #services-container {
+            text-align: center;
+        }
+
+        .service-list {
+            list-style-type: none;
+            padding: 0;
+            display: inline-block;
+        }
+
+        .service-item {
+            margin: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            display: inline-block;
+        }
+
+        .service-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .service-item.selected {
+            transition: box-shadow 0.3s ease;
+            border-color: rgb(255, 102, 0);
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.4);
+        }
+
+        .service-item {
+            text-align: center;
+            width: 150px;
+        }
+
+
+        #availability-container {
+            /* display: none; */
+            display: inline;
+            justify-content: center;
+        }
+
+        .availability-column {
+            margin: 0 20px;
+        }
+
+        .availability-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .availability-item {
+            padding: 10px;
+            margin: 7px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            display: inline-block;
+            width: 150px;
+        }
+
+        .availability-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .availability-item.selected {
+            transition: box-shadow 0.3s ease;
+            border-color: rgb(255, 102, 0);
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.4);
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .submit-button {
+            background-color: #905B22;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-size: 20px;
+        }
+
+        .submit-button:hover {
+            background-color: #684116;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Оформлення запису</h1>
+        <form action="/BarberService/SubmitAppointment" method="post">
+            <input type="text" id="name" name="name" placeholder="Ваше ім'я" required>
+            <input type="tel" id="phone" name="phone" pattern="\+380[0-9]{9}" placeholder="Номер телефону: +380123456789" required>
+            <div class="barber-cards">
+                @* @foreach (var barber in barbers)
+                { *@
+                    <div class="barber-card" data-id="@barber.Id">
+                        <div class="barber-info">
+                            <img src="@barber.PhotoUri" alt="@barber.Name @barber.Surname" class="barber-photo">
+                            <h3>@barber.Name @barber.Surname</h3>
+                        </div>
+                    </div>
+                @* } *@
+            </div>
+            <div id="services-container">
+                @* <h3 id="serv" style="display: none; margin-left: 20px; margin-top: 40px; margin-bottom: 0px;">  Виберіть послугу:</h3> *@
+                <h3 id="serv" style="display: inline; margin-left: 20px; margin-top: 40px; margin-bottom: 0px;">  Виберіть послугу:</h3>
+                <ul class="service-list">
+                </ul>
+            </div>
+            <input type="hidden" id="selected-service-id" name="SelectedServiceId" value="" required>
+
+
+
+            <div id="availability-container">
+                <div class="availability-column">
+                    <h3>Виберіть день:</h3>
+                    <ul class="availability-list" id="days-list">
+                    </ul>
+                </div>
+                <div class="availability-column">
+                    <h3>Виберіть час:</h3>
+                    <ul class="availability-list" id="time-list">
+                    </ul>
+                </div>
+            </div>
+            <input type="hidden" id="selected-day" name="SelectedDay" value="" required>
+            <input type="hidden" id="selected-time" name="SelectedTime" value="" required>
+
+            <div class="button-container">
+                <button type="submit" class="submit-button">Записатись</button>
+            </div>
+        </form>
+    </div>
+
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script>
+                $(document).ready(function () {
+                    var selectedDay = null;
+                    var selectedTime = null;
+
+                    var selectedBarberId = @barber.Id;
+
+                        const url = '/BarberService/GetServices?id=' + selectedBarberId;
+
+                        $.ajax({
+                            url: url,
+                            type: 'GET',
+                            success: function (response) {
+                                $('.service-list').empty();
+
+                                response.barberServices.forEach(function (service) {
+                                    var listItem = $('<li>', {
+                                        class: 'service-item',
+                                        text: service.title,
+                                        'data-id': service.id
+                                    });
+                                    $('.service-list').append(listItem);
+                                });
+
+                                $('#availability-container').css('display', 'flex');
+                                $('#serv').css('display', 'flex');
+
+                                generateTimeList();
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error fetching services:', error);
+                            }
+                        });
+
+                    $(document).on('click', '.service-item', function () {
+                        var selectedServiceId = $(this).data('id');
+                        console.log('Selected service ID:', selectedServiceId);
+                    });
+
+                    $(document).on('click', '.day-item', function () {
+                        $('.day-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        selectedDay = $(this).data('day');
+                        console.log('Selected day:', selectedDay);
+                        if (selectedTime) {
+                            console.log('Selected date and time:', selectedDay, selectedTime);
+                        }
+                    });
+
+                    $(document).on('click', '.time-item', function () {
+                        $('.time-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        selectedTime = $(this).data('time');
+                        console.log('Selected time:', selectedTime);
+                        if (selectedDay) {
+                            console.log('Selected date and time:', selectedDay, selectedTime);
+                        }
+                    });
+                    function generateTimeList() {
+                        var startHour = 9;
+                        var endHour = 18;
+                        var minutes = ['00', '30'];
+
+                        var timeList = $('#time-list');
+                        timeList.empty();
+                        for (var hour = startHour; hour < endHour; hour++) {
+                            minutes.forEach(function (minute) {
+                                var time = ('0' + hour).slice(-2) + ':' + minute;
+                                var listItem = $('<li>', {
+                                    class: 'availability-item',
+                                    text: time
+                                });
+                                timeList.append(listItem);
+                            });
+                        }
+                    }
+                });
+
+
+                $(document).ready(function () {
+                    $(document).on('click', '.service-item', function () {
+                        $('.service-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        var selectedServiceId = $(this).data('id');
+                        $('#selected-service-id').val(selectedServiceId);
+                        console.log('Selected service ID:', selectedServiceId);
+                    });
+                });
+
+
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const barberCards = document.querySelectorAll('.barber-card');
+
+                    barberCards.forEach(card => {
+                        card.addEventListener('click', function () {
+                            barberCards.forEach(card => {
+                                card.classList.remove('selected');
+                            });
+                            this.classList.add('selected');
+                            document.getElementById('selected-barber-id').value = this.dataset.id;
+                        });
+                    });
+                });
+
+                $(document).ready(function () {
+                    var days = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', 'Пятниця', 'Субота', 'Неділя'];
+                    var daysList = $('#days-list');
+                    days.forEach(function (day) {
+                        var listItem = $('<li>', {
+                            class: 'availability-item',
+                            text: day
+                        });
+                        listItem.data('day', day);
+                        daysList.append(listItem);
+                    });
+
+                    $(document).on('click', '.day-item', function () {
+                        var selectedDay = $(this).data('day');
+                        $('.day-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        console.log('Selected day:', selectedDay);
+                        $('#selected-day').val(selectedDay);
+                    });
+
+                    $(document).on('click', '.time-item', function () {
+                        var selectedTime = $(this).data('time');
+                        $('.time-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        console.log('Selected time:', selectedTime);
+                        $('#selected-time').val(selectedTime);
+                    });
+
+                    $(document).on('click', '#days-list .availability-item', function () {
+                        $('#days-list .availability-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        var selectedDay = $(this).text();
+                        console.log('Selected day:', selectedDay);
+                        $('#selected-day').val(selectedDay);
+                    });
+
+                    $(document).on('click', '#time-list .availability-item', function () {
+                        $('#time-list .availability-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        var selectedTime = $(this).text();
+                        console.log('Selected time:', selectedTime);
+                        $('#selected-time').val(selectedTime);
+                    });
+
+
+                });
+            </script>
+
+</body>
+</html>

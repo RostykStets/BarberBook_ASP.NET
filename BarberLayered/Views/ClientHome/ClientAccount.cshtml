@@ -1,0 +1,237 @@
+﻿@model BarberLayered.Models.Client
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Налаштування акаунта</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #905B22;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #f5a742;
+            }
+
+        .warning-button {
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 30px;
+            margin-left: 0px;
+        }
+
+        .confirmation-modal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        .confirmation-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+            .confirmation-box h2 {
+                margin-top: 0;
+            }
+
+            .confirmation-box button {
+                margin-top: 10px;
+                margin-right: 10px;
+            }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            / padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 20%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+        .button-link {
+            background-color: #905B22;
+            max-width: 120px;
+            color: #fff;
+            border: none;
+            padding: 7px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 30px;
+            text-decoration: none;
+            font-size: 15px;
+            display: block;
+        }
+
+            .button-link:hover {
+                background-color: #f5a742;
+            }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+
+    @await Html.PartialAsync("~/Views/ClientHome/ClientPartial.cshtml")
+
+    <div class="container">
+        <h1>Налаштування акаунта</h1>
+        <h3 style="text-align: left;">Редагування інформації:</h3>
+        <form id="clientForm" asp-controller="ClientHome" asp-action="UpdateClient" method="post">
+            <input type="hidden" name="Id" value="@Model.Id">
+
+            <label for="name">Ім'я:</label>
+            <input type="text" id="name" name="Name" value="@Model.Name">
+
+            <label for="surname">Прізвище:</label>
+            <input type="text" id="surname" name="Surname" value="@Model.Surname">
+
+            <label for="phone">Телефон:</label>
+            <input type="tel" id="phone" name="Phone" value="@Model.Phone">
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="Email" value="@Model.Email">
+
+            <button type="submit" style="display: block; margin: 15px auto; text-align: center;">Зберегти зміни</button>
+        </form>
+
+        <a href="/Account/ChangePassword" class="button-link">Змінити пароль</a>
+
+        <button class="warning-button" onclick="showConfirmationModal()">Вийти з акаунта</button>
+    </div>
+
+    <button class="back-button" onclick="goBack()">&#10094;</button>
+
+    <div id="confirmationModal" class="confirmation-modal" style="display: none;">
+        <div class="confirmation-box">
+            <h2 style="text-align: center;">Підтвердіть вихід</h2>
+            <p>Ви впевнені, що хочете вийти з облікового запису?</p>
+            @* <button asp-controller="Account" asp-action="Logout" style="float: left; margin-left: 50px; padding: 10px 30px;">Так</button> *@
+            <button onclick="logout()" style="float: left; margin-left: 50px; padding: 10px 30px;">Так</button>
+            <button onclick="hideConfirmationModal()" style="float: right; margin-right: 50px; padding: 10px 30px;">Ні</button>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function showConfirmationModal() {
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        function hideConfirmationModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+
+        function logout() {
+            window.location.href = "/BarberShop/Index";
+        }
+
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage !== 'null' && errorMessage !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Упс...',
+                text: errorMessage
+            });
+        }
+
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage !== 'null' && successMessage !== '') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Успішно!',
+                text: successMessage
+            });
+        }
+
+    </script>
+
+</body>
+</html>
+

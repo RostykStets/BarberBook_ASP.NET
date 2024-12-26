@@ -1,0 +1,145 @@
+﻿@* @model List<BarberLayered.Models.Barber>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Our barbers</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 0px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            header a {
+                color: #fff;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 18.5px;
+                margin: 0 10px;
+            }
+
+                header a:hover {
+                    color: #f5a742;
+                }
+
+        main {
+            padding: 20px;
+        }
+
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 7px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .account-icon {
+            font-size: 40px;
+            margin-right: 15px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 200px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+            z-index: 1;
+            right: 0;
+            border-radius: 5px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+            .dropdown-content a:hover {
+                background-color: #f1f1f1;
+            }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/ClientHome/Index">BarberBook</a>
+        <a href="/Barbers/ClientBarbers">Наші барбери</a>
+
+        <div class="dropdown">
+            <i class="material-icons account-icon" onclick="toggleDropdown()">account_circle</i>
+            <div class="dropdown-content" id="dropdownMenu">
+                <a href="#">Мої записи</a>
+                <a href="#">Мої відгуки</a>
+                <a href="#">Історія записів</a>
+                <a href="#">Налаштування акаунта</a>
+                <a href="/Account/Login">Вихід</a>
+            </div>
+        </div>
+
+    </header>
+    @Html.Partial("~/Views/Barbers/BarbersPartial.cshtml", Model)
+
+    <footer>
+        &copy; 2024 - Barber Shop
+    </footer>
+
+</body>
+</html>
+ *@
+
+
+@model List<BarberLayered.Models.Barber>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Our barbers</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+    </style>
+</head>
+<body>
+
+    @await Html.PartialAsync("~/Views/ClientHome/ClientPartial.cshtml")
+
+    @await Html.PartialAsync("~/Views/Barbers/BarbersPartial.cshtml", Model)
+
+</body>
+</html>

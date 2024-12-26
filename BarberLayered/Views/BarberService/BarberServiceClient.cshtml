@@ -1,0 +1,25 @@
+﻿@model List<BarberLayered.Models.Service>
+
+@{
+    Layout = null;
+}
+
+@{
+    var barber = ViewBag.Barber as BarberLayered.Models.Barber;
+    var reviews = ViewBag.Reviews as List<BarberLayered.Models.Review>;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@barber.Name - Barber Information</title>
+</head>
+<body>
+
+    @await Html.PartialAsync("~/Views/ClientHome/ClientPartial.cshtml")
+    @await Html.PartialAsync("~/Views/BarberService/BarberServicePartial.cshtml", Model)
+
+</body>
+</html>
+
+

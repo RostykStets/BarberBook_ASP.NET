@@ -1,0 +1,101 @@
+﻿@model BarberLayered.Models.BarberShop
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Barber Shop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .left-section {
+            float: left;
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+
+            .left-section img {
+                width: 100%;
+                height: auto;
+            }
+
+        .right-section {
+            float: left;
+            width: 45%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+            .right-section h1 {
+                font-size: 24px;
+                margin-top: 0;
+                color: #333;
+            }
+
+            .right-section p {
+                margin: 10px 0;
+                font-size: 18px;
+                color: #555;
+            }
+
+            .right-section a {
+                display: inline-block;
+                background-color: #905B22;
+                color: #fff;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 10px;
+                transition: background-color 0.3s;
+                margin-top: 50px;
+                font-size: 20px;
+            }
+
+                .right-section a:hover {
+                    background-color: #f5a742;
+                }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+
+    @if (Model == null)
+    {
+        <h2 style="text-align: center; color: forestgreen; margin-top: 100px;">Поки що немає даних про барбершоп</h2>
+    }
+    else
+    {
+        <div class="left-section">
+            <img src="https://heygoldie.com/blog/wp-content/uploads/2021/12/barber-shop-decor-ideas.jpg" alt="Barber Shop Image">
+        </div>
+        <div class="right-section">
+            <h1>@Model.Name</h1>
+            <p>Address: @Model.Address</p>
+            <p>Phone: @Model.Phone</p>
+            <p>@Model.Description</p>
+            @* <a href="/Barbers/Index">Записатись</a> *@
+    @*         <a href="@ViewData["Path"]">Записатись</a> *@
+
+        </div>
+    }
+    <script>
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage !== 'null' && errorMessage !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: errorMessage
+            });
+        }
+    </script>
+
+</body>
+</html>

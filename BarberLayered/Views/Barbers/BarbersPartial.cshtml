@@ -1,0 +1,156 @@
+﻿@model List<BarberLayered.Models.Barber>
+@{
+    var client = ViewBag.Client as BarberLayered.Models.Client;
+    ViewData["Client"] = ViewBag.Client;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Our Barbers</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .barbers-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .barber-card {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 300px;
+            padding: 20px;
+        }
+
+        .barber-photo {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .barber-info h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .barber-info p {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-button,
+        .book-button {
+            background-color: #905B22;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+            .info-button:hover,
+            .book-button:hover {
+                background-color: #684116;
+            }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination-button {
+            background-color: #905B22;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin: 0 10px;
+        }
+
+            .pagination-button:hover {
+                background-color: #684116;
+            }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+
+    <h1>Наші барбери</h1>
+    <div class="barbers-container">
+        @if (Model.Count == 0)
+        {
+            <h2 style="text-align: center; color: forestgreen; margin-top: 100px;">На даний момент ще немає барберів</h2>
+        }
+        else
+        {
+            @foreach (var barber in Model)
+            {
+                <div class="barber-card">
+                    <img src="@barber.PhotoUri" alt="@barber.Name" class="barber-photo">
+                    <div class="barber-info">
+                        <h2>@barber.Name @barber.Surname</h2>
+                        <p>@barber.Description</p>
+                        <div class="buttons">
+@*                             <a href="@(ViewBag.Client.Id != null ?
+                            Url.Action(ViewData["infoPath"].ToString(), "BarberInformation", new { id = barber.Id,  }) :
+                            Url.Action(ViewData["infoPath"].ToString(), "BarberInformation", new { id = barber.Id }))" class="info-button">Інформація</a> *@
+                            @if (ViewData["infoPath"].ToString() == "Index" && ViewData["servicePath"].ToString() == "Index")
+                            {
+                                <a href="@Url.Action(ViewData["infoPath"].ToString(), "BarberInformation", new { id = barber.Id })" class="info-button">Інформація</a>
+                                <a href="@Url.Action(ViewData["servicePath"].ToString(), "BarberService", new { id = barber.Id})" class="book-button">Записатись</a>
+                            }
+                            else if (ViewData["infoPath"].ToString() == "BarberInformationClient" && ViewData["servicePath"].ToString() == "BarberServiceClient")
+							{
+								<a href="@Url.Action(ViewData["infoPath"].ToString(), "BarberInformation", new { id = barber.Id, clientId = ViewBag.Client.Id })" class="info-button">Інформація</a>
+                                <a href="@Url.Action(ViewData["servicePath"].ToString(), "BarberService", new { id = barber.Id, clientId = ViewBag.Client.Id })" class="book-button">Записатись</a>
+							}
+
+                            @* <a href="@Url.Action(ViewData["servicePath"].ToString(), "BarberService", new { id = barber.Id, clientId = ViewBag.Client.Id })" class="book-button">Записатись</a> *@
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <button class="back-button" onclick="goBack()">&#10094;</button>
+
+    <script>
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage !== 'null' && errorMessage !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: errorMessage
+            });
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+</body>
+</html>

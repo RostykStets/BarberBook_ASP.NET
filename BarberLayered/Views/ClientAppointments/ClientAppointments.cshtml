@@ -1,0 +1,209 @@
+﻿@using System.Globalization
+@* @model List<BarberLayered.Models.Service> *@
+@model List<IGrouping<DateOnly, BusinessLogicLayer.DTOs.VisitDto>>
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мої записи</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .date-toggle {
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            text-align: center;
+            outline: none;
+            font-size: 20px;
+            color: black;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .date-content {
+            display: flex;
+            flex-direction: column;
+            /* padding-left: 20px; */
+            margin-bottom: 30px;
+        }
+
+        .service {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: calc(100% - 25px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .service-details {
+            display: flex;
+            justify-content: space-between;
+        }
+
+            .service-details p {
+                margin: 0;
+            }
+
+        .cancel-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100px;
+            margin: 0 auto;
+        }
+
+            .cancel-button:hover {
+                background-color: darkred;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 20px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+    </style>
+</head>
+<body>
+
+    @await Html.PartialAsync("~/Views/ClientHome/ClientPartial.cshtml")
+
+    <div class="container">
+        <h1>Майбутні записи</h1>
+        @if (Model.Count == 0)
+        {
+                <h2 style="text-align: center; color: forestgreen; margin-top: 100px;">У вас ще немає записів</h2>
+        }
+        else 
+        {
+            @foreach (var group in Model)
+            {
+                <button class="date-toggle" onclick="toggleDate('@group.Key.ToShortDateString()')">
+                    &#9656;@group.Key.ToShortDateString() (@group.Key.ToString("dddd", new CultureInfo("uk-UA")))
+                </button>
+                <div class="date-content" id="@group.Key.ToShortDateString()">
+                    @foreach (var visit in group)
+                    {
+                        var service = ((List<BusinessLogicLayer.DTOs.ServiceDto>)ViewBag.Services).FirstOrDefault(s => s.Id == visit.fk_ServiceId);
+                        var barber = ((List < BusinessLogicLayer.DTOs.BarberDto>)ViewBag.Barbers).FirstOrDefault(b => b.Id == visit.fk_BarberId);
+
+                        if (service != null && barber != null)
+                        {
+                            <div class="service">
+                                <h3>@visit.Time.ToString("HH:mm"):</h3>
+
+                                <table>
+                                    <tr>
+                                        <th>Барбер</th>
+                                        <th>Назва</th>
+                                        <th>Опис</th>
+                                        <th>Тривалість</th>
+                                        <th style="white-space: nowrap;">Ціна (₴)</th>
+                                        <th></th>
+                                    </tr>
+
+                                    <tr>
+                                        <td>@barber.Name</td>
+                                        <td>@service.Title</td>
+                                        <td>@service.Description</td>
+                                        <td>
+                                            @{
+                                                var durationString = $"{(service.Duration.Hour > 0 ? service.Duration.Hour + " год " : "")}{(service.Duration.Minute > 0 ? service.Duration.Minute + " хв " : "")}{(service.Duration.Second > 0 ? service.Duration.Second + " сек" : "")}";
+                                                @durationString
+                                            }
+                                        </td>
+
+                                        <td>@service.Price</td>
+                                        <td><button class="cancel-button" onclick="confirmDelete('@Url.Action("DeleteAppointment", "ClientAppointments", new { id = visit.Id, clientId = ViewBag.Client.Id })')">Відмінити запис</button></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        }
+                    }
+
+                </div>
+            }
+        }
+    </div>
+
+    <button class="back-button" onclick="goBack()">&#10094;</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        // При завантаженні сторінки зразу відкриваємо контент
+        window.onload = function () {
+            var contents = document.querySelectorAll('.date-content');
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].style.display = 'flex'; 
+            }
+        };
+
+        function toggleDate(date) {
+            var content = document.getElementById(date);
+            content.style.display = content.style.display === 'none' ? 'flex' : 'none'; 
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function confirmDelete(deleteUrl) {
+            Swal.fire({
+                title: 'Ви впевнені?',
+                text: "Ви дійсно хочете відмінити цей запис?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Так, відмінити!',
+                cancelButtonText: 'Ні, назад!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = deleteUrl;
+                }
+            })
+        }
+    </script>
+
+</body>
+</html>

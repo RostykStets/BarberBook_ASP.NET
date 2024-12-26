@@ -1,0 +1,129 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Відгуки про мене</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1.reviews {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .review-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+            .review-item:last-child {
+                border-bottom: none;
+            }
+
+        .review-text {
+            margin: 0;
+            font-size: 22px;
+            line-height: 1.4;
+        }
+
+        .review-details {
+            font-style: italic;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .review-rating {
+            color: #ffd700;
+        }
+
+        .delete-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+            .delete-button:hover {
+                background-color: darkred;
+            }
+
+        .text-center {
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    @await Html.PartialAsync("~/Views/BarberHome/BarberHomePartial.cshtml")
+
+    <div class="container">
+        <h1 class="reviews" style="margin-bottom:50px;">Відгуки про мене</h1>
+
+        @if (ViewBag.Reviews.Count == 0)
+        {
+            <h2 style="text-align: center; color: forestgreen; margin-top: 100px;">Про вас ще немає відгуків</h2>
+        }
+        else
+        {
+            float totalRating = 0;
+            foreach (var review in ViewBag.Reviews)
+            {
+                totalRating += review.Rating;
+            }
+            float averageRating = totalRating / ViewBag.Reviews.Count;
+
+            <h2 style="text-align: center; margin-bottom: 100px;">Середня оцінка: <span class="review-rating">@averageRating.ToString("0.0")/5</span></h2>
+
+            <div class="reviews">
+                @foreach (var review in ViewBag.Reviews)
+                {
+                    <div class="review-item">
+                        <p class="review-text">@review.Text</p>
+                        <p class="review-details">Дата: @review.Date.ToShortDateString() | Оцінка: <span style="color: #ffd700;">@review.Rating/5</span></p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Кнопка назад -->
+    <button class="back-button" onclick="goBack()">&#10094;</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        var errorMessage = '@TempData["ErrorMessage"]';
+        if (errorMessage !== 'null' && errorMessage !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Упс...',
+                text: errorMessage
+            });
+        }
+
+        // Функція для повернення на попередню сторінку
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

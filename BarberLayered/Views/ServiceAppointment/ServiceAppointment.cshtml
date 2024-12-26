@@ -1,0 +1,352 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Записи на послуги</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .date-select-container {
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        #dateSelect {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #FFA500;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+            #dateSelect:focus {
+                outline: none;
+                border-color: #FFA500;
+            }
+
+        .schedule {
+            margin-top: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .time-slider {
+            position: relative;
+            height: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .time-slider-handle {
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            background-color: #FFA500;
+            border-radius: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+
+        .hour-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            padding: 0 5px;
+            position: absolute;
+            width: 100%;
+            bottom: -35px;
+            margin-bottom: 10px;
+        }
+
+        .hour-label {
+            text-align: center;
+            width: calc(100% / 10);
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #FFA500;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+            select:focus {
+                outline: none;
+                border-color: #FFA500;
+            }
+
+        .input-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+            .input-container input {
+                flex: 1;
+                padding: 10px;
+                font-size: 16px;
+                border: 2px solid #FFA500;
+                border-radius: 5px;
+                width: 250px;
+                margin-top: 20px;
+                transition: border-color 0.3s;
+            }
+
+                .input-container input:last-child {
+                    margin-right: 0;
+                }
+
+                .input-container input:focus {
+                    outline: none;
+                    border-color: #FFA500;
+                }
+
+        .reserve-button {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+            .reserve-button button {
+                padding: 10px 20px;
+                font-size: 16px;
+                background-color: #8B4513;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 30px;
+                transition: background-color 0.3s;
+            }
+
+                .reserve-button button:hover {
+                    background-color: #CD853F;
+                }
+
+        .selected {
+            background-color: #8B4513 !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <button class="back-button" onclick="goBack()">&#10094;</button>
+
+    <div class="container">
+        @*<h1>@Model.Barber?.Name @Model.Barber?.Surname - @Model.Service?.Title</h1>*@
+
+        <h2>Оберіть день і час:</h2>
+
+        <div class="date-select-container">
+            <select id="dateSelect" onchange="showSchedule()">
+                @for (int i = 0; i < 14; i++)
+                {
+                    var currentDate = DateTime.Today.AddDays(i);
+                    <option value="@currentDate.ToString("dd.MM.yyyy")">@currentDate.ToString("dd.MM.yyyy, dddd")</option>
+                    @* <option value="@currentDate.ToString("dd.MM.yyyy")" style="text-align: center;">@currentDate.ToString("dd.MM.yyyy, dddd")</option> *@
+                }
+            </select>
+        </div>
+
+        <div class="schedule" id="scheduleContainer">
+        </div>
+
+        <div class="reserve-button">
+            <div id="selectedTime"></div>
+            <div class="input-container">
+                <div style="display: flex; flex-direction: column; margin: 0 auto; margin-top:40px; text-align: center;">
+                    <input type="text" id="fullName" placeholder="Введіть ваше ім'я" required />
+                    <input type="text" id="fullName" placeholder="Введіть ваше прізвище" required />
+                    <input type="text" id="phoneNumber" placeholder="Введіть номер телефона" required />
+                    @*                     <input type="text" id="selectedDateTime" readonly style="width: 300px; margin-top: 10px;" />
+                    *@
+                </div>
+            </div>
+            <span id="selectedDateTime"></span>
+            <button style="padding:12px 30px;" onclick="makeAppointment()">Записатись</button>
+        </div>
+    </div>
+
+    <script>
+        let isDragging = false;
+
+        function startDrag() {
+            isDragging = true;
+
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+        }
+
+        function drag(event) {
+            if (isDragging) {
+                let timeSlider = document.getElementById('timeSlider');
+                let timeSliderHandle = document.getElementById('timeSliderHandle');
+
+                let sliderRect = timeSlider.getBoundingClientRect();
+                let handleRect = timeSliderHandle.getBoundingClientRect();
+
+                let offsetX = event.clientX - sliderRect.left - handleRect.width / 2;
+                let maxX = sliderRect.width - handleRect.width;
+
+                if (offsetX < 0) {
+                    offsetX = 0;
+                } else if (offsetX > maxX) {
+                    offsetX = maxX;
+                }
+
+                let percentage = (offsetX / maxX) * 100;
+                timeSliderHandle.style.left = percentage + '%';
+
+                // Отримання часу на основі позиції повзунка
+                let hours = Math.round((percentage / 100) * 12) + 8;
+                let selectedTime = hours + ':00';
+                
+                // Оновлення тексту вибраного часу
+                document.getElementById('selectedTime').innerText = 'Вибраний час: ' + selectedTime;
+                document.getElementById('selectedTime').style.marginTop = '5px';
+                updateSelectedDateTime();
+            }
+        }
+
+        function endDrag() {
+            isDragging = false;
+
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', endDrag);
+        }
+
+        function updateSelectedDateTime() {
+            let selectedDate = document.getElementById('dateSelect').value;
+            let selectedTime = document.getElementById('selectedTime').innerText;
+            document.getElementById('selectedDateTime').value = 'Вибрана дата та час: ' + selectedDate + ' ' + selectedTime;
+        }
+
+        function showSchedule() {
+            var selectedDate = document.getElementById('dateSelect').value;
+            var scheduleContainer = document.getElementById('scheduleContainer');
+            scheduleContainer.innerHTML = '';
+
+            var timeSlider = document.createElement('div');
+            timeSlider.classList.add('time-slider');
+            timeSlider.setAttribute('id', 'timeSlider');
+            timeSlider.addEventListener('mousedown', startDrag);
+
+            var timeSliderHandle = document.createElement('div');
+            timeSliderHandle.classList.add('time-slider-handle');
+            timeSliderHandle.setAttribute('id', 'timeSliderHandle');
+
+            timeSlider.appendChild(timeSliderHandle);
+            scheduleContainer.appendChild(timeSlider);
+
+            var hourLabels = document.createElement('div');
+            hourLabels.classList.add('hour-labels');
+
+            for (var i = 8; i <= 20; i++) {
+                var hourLabel = document.createElement('div');
+                hourLabel.classList.add('hour-label');
+                hourLabel.innerText = i + ':00';
+                hourLabels.appendChild(hourLabel);
+            }
+
+            scheduleContainer.appendChild(hourLabels);
+
+            scheduleContainer.style.display = 'block';
+            updateSelectedDateTime();
+        }
+
+        function makeAppointment() {
+            var fullName = document.getElementById('fullName').value;
+            var phoneNumber = document.getElementById('phoneNumber').value;
+            var selectedDate = document.getElementById('dateSelect').value;
+            var selectedTime = document.getElementById('selectedTime').innerText;
+
+            alert('Ваше ім\'я та прізвище: ' + fullName + '\nНомер телефону: ' + phoneNumber + '\nДата: ' + selectedDate + ' \n' + selectedTime);
+        }
+
+        // Оновлюємо вибраний час кожну хвилину
+        setInterval(updateSelectedTime, 60000); // Оновлення кожні 60000 мілісекунд (1 хвилина)
+
+        function updateSelectedTime() {
+            let date = new Date();
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            let hoursString = (hours < 10 ? '0' : '') + hours;
+            let minutesString = (minutes < 10 ? '0' : '') + minutes;
+            let selectedTime = hoursString + ':' + minutesString;
+            document.getElementById('selectedTime').innerText = 'Вибраний час: ' + selectedTime;
+        }
+
+        // Викликаємо showSchedule() після завантаження сторінки
+        showSchedule();
+        function drag(event) {
+            if (isDragging) {
+                let timeSlider = document.getElementById('timeSlider');
+                let timeSliderHandle = document.getElementById('timeSliderHandle');
+
+                let sliderRect = timeSlider.getBoundingClientRect();
+                let handleRect = timeSliderHandle.getBoundingClientRect();
+
+                let offsetX = event.clientX - sliderRect.left - handleRect.width / 2;
+                let maxX = sliderRect.width - handleRect.width;
+
+                if (offsetX < 0) {
+                    offsetX = 0;
+                } else if (offsetX > maxX) {
+                    offsetX = maxX;
+                }
+
+                let percentage = (offsetX / maxX) * 100;
+                timeSliderHandle.style.left = percentage + '%';
+
+                // Отримання часу на основі позиції повзунка
+                let totalMinutes = Math.round((percentage / 100) * 12 * 60) + 8 * 60;
+                let hours = Math.floor(totalMinutes / 60);
+                let minutes = totalMinutes % 60;
+                let selectedTime = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+                // Оновлення тексту вибраного часу
+                document.getElementById('selectedTime').innerText = 'Вибраний час: ' + selectedTime;
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+</body>
+</html>

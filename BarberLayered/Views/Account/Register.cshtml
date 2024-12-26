@@ -1,0 +1,217 @@
+﻿@model BarberLayered.Models.RegisterViewModelWithKey
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            width: 425px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 7px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        button[type="submit"] {
+            width: 50%;
+            padding: 10px 20px;
+            background-color: #905B22;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #f5a742;
+        }
+
+        .login-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+            font-size: 18px;
+        }
+
+            .login-text a {
+                color: #905B22;
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+                .login-text a:hover {
+                    color: #f5a742;
+                }
+
+        .form-control-large {
+            font-size: 16px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h2 style="text-align: center;">Реєстрація</h2>
+        <form asp-controller="Account" asp-action="Register" method="post">
+            <div class="form-group">
+                <label for="userType">Тип користувача:</label>
+                <select class="form-control form-control-large" id="userType" name="UserType" required>
+                    <option value="Client">Клієнт</option>
+                    <option value="Barber">Барбер</option>
+                    <option value="Admin">Адміністратор</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="firstName">Ім'я':</label>
+                <input type="text" class="form-control" id="firstName" name="FirstName" placeholder="Введіть ваше ім'я" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Прізвище:</label>
+                <input type="text" class="form-control" id="lastName" name="LastName" placeholder="Введіть ваше прізвище" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Телефон:</label>
+                <input type="text" class="form-control" id="phone" name="Phone" placeholder="+38(__)_______" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="Email" placeholder="user@gmail.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" class="form-control" id="password" name="Password" placeholder="Введіть пароль" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Підтвердіть пароль:</label>
+                <input type="password" class="form-control" id="confirmPassword" name="ConfirmPassword" placeholder="Підтвердіть пароль:" required>
+            </div>
+            <div id="registrationKeyField" class="form-group" style="display:none;">
+                <label for="registrationKey">Ключ:</label>
+                <input type="text" class="form-control" id="registrationKey" name="RegistrationKey" placeholder="Введіть ключ реєстрації" required>
+            </div>
+            <div class="button-container">
+                <button type="submit">Зареєструватись</button>
+            </div>
+        </form>
+        <div class="login-text">
+            Вже маєте обліковий запис? <a href="/Account/Login">Увійти</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var inputFields = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+            inputFields.forEach(function (input) {
+                input.addEventListener('focus', function () {
+                    this.placeholder = '';
+                });
+                input.addEventListener('blur', function () {
+                    this.placeholder = this.getAttribute('placeholder');
+                });
+            });
+
+            var phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', function () {
+                // Перевірка телефонного номеру
+                var phonePattern = /^\+38\(\d{3}\)\d{7}$/;
+                if (!phonePattern.test(this.value)) {
+                    this.setCustomValidity('Please enter a valid phone number in the format +38(___)_______');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            var passwordInput = document.getElementById('password');
+            passwordInput.addEventListener('input', function () {
+                // Перевірка пароля
+                if (this.value.length < 8) {
+                    this.setCustomValidity('Password must be at least 8 characters long');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            var confirmPasswordInput = document.getElementById('confirmPassword');
+            confirmPasswordInput.addEventListener('input', function () {
+                // Перевірка збігу паролей
+                var password = document.getElementById('password').value;
+                if (this.value !== password) {
+                    this.setCustomValidity('Passwords do not match');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            var userTypeSelect = document.getElementById('userType');
+            var registrationKeyField = document.getElementById('registrationKeyField');
+            userTypeSelect.addEventListener('change', function () {
+                if (this.value === 'Barber' || this.value === 'Admin') {
+                    registrationKeyField.style.display = 'block';
+                    document.getElementById('registrationKey').setAttribute('required', 'required');
+                } else {
+                    registrationKeyField.style.display = 'none';
+                    document.getElementById('registrationKey').removeAttribute('required');
+                }
+            });
+
+            var errorMessage = '@TempData["ErrorMessage"]';
+            if (errorMessage !== 'null' && errorMessage !== '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: errorMessage
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

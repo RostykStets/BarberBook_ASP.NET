@@ -1,0 +1,184 @@
+﻿@model BarberLayered.Models.LoginViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            width: 400px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        select {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        button[type="submit"] {
+            width: 50%;
+            padding: 10px 20px;
+            background-color: #905B22;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #f5a742;
+        }
+
+        .login-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+            font-size: 16px;
+        }
+
+            .login-text a {
+                color: #905B22;
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+                .login-text a:hover {
+                    color: #f5a742;
+                }
+
+        select {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h2 style="text-align: center;">Вхід</h2>
+        <form asp-controller="Account" asp-action="Login" method="post">
+            <div class="form-group">
+                @*                 <label for="userType">User Type:</label>
+                <select class="form-control" id="userType" name="UserType" required>
+                <option value="">-- Select User Type --</option>
+                <option value="Client">Client</option>
+                <option value="Barber">Barber</option>
+                <option value="Admin">Admin</option>
+                </select> *@
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="Email" placeholder="Введіть свій email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" class="form-control" id="password" name="Password" placeholder="Введіть свій пароль" required>
+            </div>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="form-group">
+                    <p class="text-danger">@Html.ValidationSummary()</p>
+                </div>
+            }
+
+
+            <div class="button-container">
+                <button type="submit">Увійти</button>
+            </div>
+        </form>
+        <div class="login-text">
+            Ще не маєте облікового запису? <a href="/Account/Register">Зареєструватись</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var emailInput = document.getElementById('email');
+            emailInput.addEventListener('focus', function () {
+                this.placeholder = '';
+            });
+            emailInput.addEventListener('blur', function () {
+                this.placeholder = 'Enter your email';
+            });
+
+            var passwordInput = document.getElementById('password');
+            passwordInput.addEventListener('focus', function () {
+                this.placeholder = '';
+            });
+            passwordInput.addEventListener('blur', function () {
+                this.placeholder = 'Enter your password';
+            });
+
+            // passwordInput.addEventListener('input', function () {
+            //     if (this.value.length < 8) {
+            //         this.setCustomValidity('Password must be at least 8 characters long');
+            //     } else {
+            //         this.setCustomValidity('');
+            //     }
+            // });
+
+            var errorMessage = '@TempData["ErrorMessage"]';
+            if (errorMessage !== 'null' && errorMessage !== '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: errorMessage
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
